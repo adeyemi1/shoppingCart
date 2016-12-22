@@ -1,0 +1,28 @@
+<div class="container">
+<p class="text-right"><a href="">Basket {{totalItems}}</a></p>
+	<table class="table table-hover table-bordered">
+		<tr class="well">
+			<th class="my_item1">Description</th>
+			<th class="my_item"><b>Price</b></th>
+			<td class="MyRight" colspan="4" >
+				<p class="text">Action</p>
+			</td>
+		</tr>
+		<tr ng-repeat="product in products | orderBy:'name'" >
+			<td >
+				<a href=""><b>{{product.name}}</b></a><br />
+				{{product.description}}
+			</td>
+			<td >
+				{{product.price | currency}}
+			</td>
+			<td >
+				<a href="" ng-click="addToCart(product)">
+					add to cart
+				</a>
+			</td>
+		</tr>
+	</table>
+
+	<p style="float: right;" ><a href="#/checkout">Proceed To checkout</a></p>
+</div>

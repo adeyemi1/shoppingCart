@@ -1,0 +1,100 @@
+This challenge involves creating a simple shopping basket interface that interacts with web services running on your local machine. The web services are provided as a Node.js based HTTP server. Your task is to implement the application specifications outlined below and deliver the user interface designs shown in the wireframes provided.
+
+The wireframes for the application views that should be created are shown in the PDF provided: wireframes PDF
+
+You should build the interface using AngularJS: https://angularjs.org/
+
+Please read these instructions carefully. Your code will be reviewed against the specifications outlined below.
+
+You are creating a two stage process following the supplied wireframes.
+
+Product List view. Display a product list and allow users to add products to a shopping basket.
+Basket Checkout view. Manage the contents of the basket, including support for promotional discount codes and complete a rudimentary checkout process.
+Checkout Result views. A view to display the outcome of the checkout transaction to the user ­ either success or failure.
+A simple Node.js based HTTP server is provided to allow you to interact with web services to support the user interface.
+
+Installing and running the Node server.
+
+As specified in the prerequisites, current versions of Node.js and npm should be installed on your machine. The code for the node server is available to download as a ZIP file.
+
+Navigate into the new directory and run:
+
+npm install
+
+This will install the required node modules. You can now run the server using
+
+node server.js
+
+You should not need to make changes to the server.js file supplied, but if you do want to make modifications during testing you might want to install something like nodemon (http://nodemon.io/) to automatically restart the server after making changes.
+
+In the directory run
+
+npm install nodemon
+
+And now start the server using
+
+nodemon server.js
+
+By default the Node HTTP server will run on port 9001. You can easily change this by editing the value of the PORT variable near the top of the server.js file.
+
+You can now access the running server here: http://localhost:9001/
+
+Please note that this is a NOT a robust server in terms of handling unknown request paths; validating submitted data; delivering standard errors and messages etc.. It’s designed to support the requirements of the challenge ONLY (!). The server does NOT support sessions.
+
+The Node HTTP server provides three endpoints.
+
+GET /products
+
+which delivers JSON data for the product list. The JSON delivered from this endpoint is in the products.json file.
+
+POST /promocode
+
+This endpoint expects JSON as the request body. A sample JSON request body is in the promocode.json file.
+
+The service validates the user submitted promotional code.
+Valid promotional codes are matched against the pattern: ^X([\d]{1,2})$, so X0; X1; X10; X99 are valid promotional codes.
+If a valid promotional code is submitted, the response will be similar to: validpromocode_sample_response.json
+The discount is a percentage off the total basket price.
+The amount of the discount is based on the code submitted e.g. X10 gives a 10% discount; X5 gives a 5% discount as does X05.
+If the submitted promotional code is invalid a response with a Bad Request 400 status code is returned with an error message. The error response body is similar to: invalidpromocode_error_response.json
+POST /checkout
+
+The endpoint expects JSON as the request body. A sample JSON request body is in the basket_sample.json.
+
+For a valid request body the response will have a status code of 200.
+There are two special card numbers that can be submitted to:
+always generate an error response (a failed transaction): 4929718047638157
+generate an error response at random 50% of the time: 5598208090357951
+Product List view
+
+The BASKET link should navigate the user to the Basket Checkout view.
+The ADD TO BASKET button should add the relevant product to the shopping basket.
+Each time the ADD TO BASKET button is clicked the quantity of the product in the basket should be incremented by one i.e. if the user clicks the ADD TO BASKET button for Product One five times the basket will contain a quantity of 5 for Product One.
+The user should be able to add a maximum quantity of 10 of each product to the Basket. This can be handled silently i.e. clicking ADD TO BASKET for a product that already has a quantity of 10 in the basket can have no effect. There is no requirement to notify the user that they already have the maximum quantity allowed for the product.
+The number by the word BASKET in the header should be the total number of products in the basket i.e. if the basket contains 1x Product One and 2x Product Two then the Basket display should show a value of 1 + 2 = 3.
+The PROCEED TO CHECKOUT link should navigate the user to the Basket Checkout view.
+Basket Checkout view
+
+The CONTINUE SHOPPING link should navigate back to the Product List view.
+The view should display the list of products in the basket with the quantities.
+The product name should be displayed.
+The line price should be the total price for that line item i.e. unit price multiplied by quantity.
+The REMOVE button should completely remove the line item from the basket.
+The quantity field should be a drop down with numbers 1­10. NB. there is no 0 value quantity.
+Note that there is no basket update button. If the user changes the quantity of a particular product that should be reflected immediately.
+The sub­total should be total price before any promotional discount is applied. This is calculated on the client.
+The promotional discount amount should be the discount delivered by any valid promotional code entered by the user. This is calculated on the client.
+Promotional discount values should be rounded up to the nearest 1/100th of a currency unit.
+The basket total should be the total price after promotional discount is applied. This should be calculated on the client.
+Promotional discount does NOT need to be shown for each line item. The promotional discount applies to the basket as a whole.
+The APPLY button should make a POST request to the Node server endpoint /promocodesending the user entered Promotional Code. The parameter name should be promoCode. Sample JSON for the request body is in the promocode.json file.
+As noted above the Node server does not support sessions. If the user has entered a valid promotional code but continued shopping for example, the client should retain the promotional discount information and apply it appropriately to any changes to the basket content.
+Only one promotional code is valid at a time. If the user enters a new promotional code, then that replaces any valid promo code already being used.
+The card number field should contain a valid credit card number. The card number entered should conform to the Luhn algorithm. Please see here for information and sample code: https://www.rosettacode.org/wiki/Luhn_test_of_credit_card_numbers
+You should prevent card numbers that do not conform to the Luhn algorithm from being submitted to the server /checkoutendpoint if the user tries to click the CHECKOUT button.
+This is a VALID card number: 4539456463019519
+This is an INVALID card number: 1234567812345678
+If the basket is empty the user should not be able to click the CHECKOUT button.
+If the basket contains products and the card number field contains a valid card number clicking the CHECKOUT button should make a POST request to the /checkoutendpoint. The request body should be JSON. Sample JSON for the request body is in the file: basket_sample.json.The variable names are basket and cardNumber.
+If the response to the POST to /checkouthas a 200 status code, the transaction has completed successfully and the user should see the success Checkout Result view. The response to a successful checkout will have a body such as: {“msg”: “The transaction was completed successfully.”}
+As in the real world, even for a valid basket and cardNumber, the transaction may not always be successful. If the transaction is not successful the response will have a 400 status code and include error information similar to error responses from other endpoints. POSTING to the /checkout­errorendpoint can be used for testing. This will always return an error response.
